@@ -3,33 +3,16 @@
 import argparse
 import logging
 
+import character_mapping 
+char_map = character_mapping.character_mapping()
+
 # Set up logging configuration
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
-# Leet speak dictionary
-char_map = {
-    "a": ["a", "4", "@"],
-    "A": ["A", "4", "@"],
-    "e": ["e", "3"],
-    "E": ["E", "3"],
-    "i": ["i", "1", "!"],
-    "I": ["I", "1", "!"],
-    "o": ["o", "0"],
-    "O": ["O", "0"],
-    "s": ["s", "5", "$"],
-    "S": ["S", "5", "$"],
-    "t": ["t", "7"],
-    "T": ["T", "7"],
-    "z": ["z", "2"],
-    "Z": ["Z", "2"],
-    " ": [" ", "_", "-"]
-}
-
-
-def generate_variations(input_string):
+def generate_variations(input_string, current_index = 0, current_variation = ""):
     """
     Generate all possible variations of the given input string and the global char map.
 
@@ -39,29 +22,40 @@ def generate_variations(input_string):
     Returns:
         list: A list of strings containing speak variations.
     """
+    if current_index == len(input_string):
+        return [current_variation]
 
-    def generate_variation(input_string, current_index, current_variation):
-        if current_index == len(input_string):
-            return [current_variation]
-
-        char = input_string[current_index]
-        variations = []
-        if char in char_map:
-            for replacement in char_map[char]:
-                new_variation = current_variation + replacement
-                variations += generate_variation(
-                    input_string, current_index + 1, new_variation
-                )
-        else:
-            variations += generate_variation(
-                input_string, current_index + 1, current_variation + char
+    char = input_string[current_index]
+    variations = []
+    if char in char_map:
+        for replacement in char_map[char]:
+            new_variation = current_variation + replacement
+            variations += generate_variations(
+                input_string, current_index + 1, new_variation
             )
+    else:
+        variations += generate_variations(
+            input_string, current_index + 1, current_variation + char
+        )
 
-        return variations
+    return variations
 
-    all_variations = generate_variation(input_string, 0, "")
-    return all_variations
+def estimate_permutations(input_string, character_map):
+    """
+    Quickly estimate the number of permutations for the given input string and character map.
 
+    Parameters:
+        input_string (str): The input string to estimate permutations for.
+        character_map (dict): The character map dictionary.
+
+    Returns:
+        int: The estimated number of permutations.
+    """
+    permutations_estimate = 1
+    for char in input_string:
+        if char in character_map:
+            permutations_estimate *= len(character_map[char])
+    return permutations_estimate
 
 def main():
     """
@@ -89,7 +83,11 @@ def main():
 
     input_string = args.input_string
     logger.info("Input string: %s", input_string)
-    logger.info("Adding suffixes %s", str(list(args.suffix)))
+    if args.suffix:
+        logger.info("Adding suffixes %s", str(list(args.suffix)))
+
+    estimated_perms = estimate_permutations(input_string, char_map)
+    logger.info("Estimated permutations: %s" % str(estimated_perms))
 
     all_variations = generate_variations(input_string)
 
@@ -97,14 +95,14 @@ def main():
         total_variations = len(all_variations) * (len(args.suffix) + 2)
     else:
         total_variations = len(all_variations)
-    logger.info("Total variations to be generated: %s", total_variations)
+    logger.info("Total variations generated: %s", total_variations)
 
     output_file = args.output_file
 
     with open(output_file, "w", encoding="utf-8") as file:
         for index, variation in enumerate(all_variations):
             if (index + 1) % 100000 == 0 or index == total_variations - 1:
-                logger.info("Generated %s variations.", index + 1)
+                logger.debug("Written %s variations.", index + 1)
             file.write(variation + "\n")
             if args.suffix:
                 for i in range(len(args.suffix)+1):
