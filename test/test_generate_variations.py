@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import cruncher
+import generator
 
 char_map = {
     "a": ["a", "4", "@"],
@@ -22,15 +22,15 @@ char_map = {
 
 
 def test_generate_variations_simple():
-    assert cruncher.generate_variations("a") == ["a", "4", "@"]
+    assert generator.generate_variations("a", char_map) == ["a", "4", "@"]
 
 
 def test_generate_variations_simple_negative():
-    assert cruncher.generate_variations("a") != ["b", "4", "@"]
+    assert generator.generate_variations("a", char_map) != ["b", "4", "@"]
 
 
 def test_generate_variations_medium():
-    assert cruncher.generate_variations("Test") == [
+    assert generator.generate_variations("Test", char_map) == [
         "Test",
         "Tes7",
         "Te5t",
@@ -58,4 +58,4 @@ def test_generate_variations_medium():
     ]
 
 def test_generate_variations_medium_negative():
-    assert cruncher.generate_variations("Test") != [""]
+    assert generator.generate_variations("Test", char_map) != [""]
