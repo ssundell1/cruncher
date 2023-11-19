@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+Main module
+"""
 
 import argparse
 import logging
@@ -18,7 +21,9 @@ def main():
     """
     parser = argparse.ArgumentParser(description="Generate variations of a string.")
     parser.add_argument("input_string", help="The input string for generating variations.")
-    parser.add_argument("--output-file","-o", help="Output file to save the variations. Default: variations.txt", default="variations.txt")
+    parser.add_argument("--output-file","-o",
+                        help="Output file to save the variations. Default: variations.txt",
+                        default="variations.txt")
     args = parser.parse_args()
 
     character_map = character_mapping.character_mapping()
@@ -26,7 +31,7 @@ def main():
     logger.info("Input string: %s", args.input_string)
 
     estimated_perms = generator.estimate_permutations(args.input_string, character_map)
-    logger.info("Estimated permutations: %s" % str(estimated_perms))
+    logger.info("Estimated permutations: %s", str(estimated_perms))
 
     all_variations = generator.generate_variations(args.input_string, character_map)
 

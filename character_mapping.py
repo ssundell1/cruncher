@@ -1,3 +1,7 @@
+"""
+Module for configuring the character substitution map to use
+"""
+
 def character_mapping():
     """
     Substitution dictionary
